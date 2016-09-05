@@ -1,0 +1,188 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/styles.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="page-header">
+          <h1>Boxes</h1>
+          <button onClick="createGame()">Create Game</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <th></th>
+              <th>0</th>
+              <th>1</th>
+              <th>2</th>
+              <th>3</th>
+              <th>4</th>
+              <th>5</th>
+              <th>6</th>
+              <th>7</th>
+              <th>8</th>
+              <th>9</th>
+            </thead>
+            <tbody>
+              <tr><th>Row</th>
+                <td data-coordinates="00"></td><td data-coordinates="10"></td><td data-coordinates="20"></td><td data-coordinates="30"></td><td data-coordinates="40"></td><td data-coordinates="50"></td><td data-coordinates="60"></td><td data-coordinates="70"></td><td data-coordinates="80"></td><td data-coordinates="90"></td>
+              </tr>
+              <tr><th>Row</th>
+                <td data-coordinates="01"></td><td data-coordinates="11"></td><td data-coordinates="21"></td><td data-coordinates="31"></td><td data-coordinates="41"></td><td data-coordinates="51"></td><td data-coordinates="61"></td><td data-coordinates="71"></td><td data-coordinates="81"></td><td data-coordinates="91"></td>
+              </tr>
+              <tr><th>Row</th>
+                <td data-coordinates="02"></td><td data-coordinates="12"></td><td data-coordinates="22"></td><td data-coordinates="32"></td><td data-coordinates="42"></td><td data-coordinates="52"></td><td data-coordinates="62"></td><td data-coordinates="72"></td><td data-coordinates="82"></td><td data-coordinates="92"></td>
+              </tr>
+              <tr><th>Row</th>
+                <td data-coordinates="03"></td><td data-coordinates="13"></td><td data-coordinates="23"></td><td data-coordinates="33"></td><td data-coordinates="43"></td><td data-coordinates="53"></td><td data-coordinates="63"></td><td data-coordinates="73"></td><td data-coordinates="83"></td><td data-coordinates="93"></td>
+              </tr>
+              <tr><th>Row</th>
+                <td data-coordinates="04"></td><td data-coordinates="14"></td><td data-coordinates="24"></td><td data-coordinates="34"></td><td data-coordinates="44"></td><td data-coordinates="54"></td><td data-coordinates="64"></td><td data-coordinates="74"></td><td data-coordinates="84"></td><td data-coordinates="94"></td>
+              </tr>
+              <tr><th>Row</th>
+                <td data-coordinates="05"></td><td data-coordinates="15"></td><td data-coordinates="25"></td><td data-coordinates="35"></td><td data-coordinates="45"></td><td data-coordinates="55"></td><td data-coordinates="65"></td><td data-coordinates="75"></td><td data-coordinates="85"></td><td data-coordinates="95"></td>
+              </tr>
+              <tr><th>Row</th>
+                <td data-coordinates="06"></td><td data-coordinates="16"></td><td data-coordinates="26"></td><td data-coordinates="36"></td><td data-coordinates="46"></td><td data-coordinates="56"></td><td data-coordinates="66"></td><td data-coordinates="76"></td><td data-coordinates="86"></td><td data-coordinates="96"></td>
+              </tr>
+              <tr><th>Row</th>
+                <td data-coordinates="07"></td><td data-coordinates="17"></td><td data-coordinates="27"></td><td data-coordinates="37"></td><td data-coordinates="47"></td><td data-coordinates="57"></td><td data-coordinates="67"></td><td data-coordinates="77"></td><td data-coordinates="87"></td><td data-coordinates="97"></td>
+              </tr>
+              <tr><th>Row</th>
+                <td data-coordinates="08"></td><td data-coordinates="18"></td><td data-coordinates="28"></td><td data-coordinates="38"></td><td data-coordinates="48"></td><td data-coordinates="58"></td><td data-coordinates="68"></td><td data-coordinates="78"></td><td data-coordinates="88"></td><td data-coordinates="98"></td>
+              </tr>
+              <tr><th>Row</th>
+                <td data-coordinates="09"></td><td data-coordinates="19"></td><td data-coordinates="29"></td><td data-coordinates="39"></td><td data-coordinates="49"></td><td data-coordinates="59"></td><td data-coordinates="69"></td><td data-coordinates="79"></td><td data-coordinates="89"></td><td data-coordinates="99"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+  <!-- JQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <!-- Latest compiled and minified Bootstrap JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyABB9HiB6gA2cEyWBo5WCr5ui3D_DowCJQ",
+      authDomain: "boxes-1b80b.firebaseapp.com",
+      databaseURL: "https://boxes-1b80b.firebaseio.com",
+      storageBucket: "boxes-1b80b.appspot.com",
+    };
+    firebase.initializeApp(config);
+  </script>
+  <script>
+
+  //TODO: change this path
+  var boxPath = '/games/-KQvjeOLreJsmjCXTzDZ/boxes';
+  var boxRefs = firebase.database().ref(boxPath);
+
+  // handle initial fetch of box info
+  boxRefs.once('value', function(snapshot) {
+    var boxes = snapshot.val();
+    boxes.forEach(function(box) {
+      setBoxContent(box);
+    })
+  });
+
+  // handle real-time box updates
+  boxRefs.on('child_changed', function(box) {
+    box = box.val();
+    clearBoxContent(box);
+    setBoxContent(box);
+  });
+
+  function clearBoxContent(box) {
+    var coordinates  = (box.position.x.toString() + box.position.y.toString());
+    var boxContainer = $('[data-coordinates="' + coordinates +'"]')[0];
+    $(boxContainer).empty();
+  }
+
+  function setBoxContent(box) {
+    var coordinates  = (box.position.x.toString() + box.position.y.toString());
+    var boxContainer = $('[data-coordinates="' + coordinates +'"]')[0];
+    if (box.user) {
+      // show user name that owns box
+      $(boxContainer).text(box.user.name);
+    } else {
+      // print a button to claim the box
+      var claimButton = '<button class="btn btn-xs btn-primary">claim</button>';
+      $(boxContainer).append(claimButton);
+      var $claimButton = $(boxContainer).find( "button" )[0]
+      $claimButton.addEventListener("click", function(e) {
+        e.preventDefault();
+        claimBox(box);
+      })
+    }
+  }
+
+  function claimBox(box) {
+    console.log(box);
+    var username = 'Mike';
+
+    var boxUserData = {
+      name: username
+    };
+
+    var updates = {};
+    updates[boxPath + '/' + box.id + '/user'] = boxUserData;
+    return firebase.database().ref().update(updates, onUpdateComplete);
+  }
+
+  function createGame() {
+    const GRID_WIDTH  = 10;
+    const GRID_HEIGHT = 10;
+    // Create the boxes
+    var boxes = [];
+
+    for (var x = 0; x < GRID_WIDTH; x++) {
+
+      for (var y = 0; y < GRID_HEIGHT; y++) {
+        //var newBoxKey = firebase.database().ref().child('games').child('boxes').push().key;
+        var box = {
+          id: boxes.length,
+          position: {
+            x: x,
+            y: y,
+          }
+        };
+        boxes.push(box);
+      }
+
+    }
+    // Get a key for a new game.
+    var newGameKey = firebase.database().ref().child('games').push().key;
+
+    // game data
+    var gameData = {
+      createdDate: new Date(),
+      boxes: boxes
+    };
+
+    // Write the new post's data simultaneously in the posts list and the user's post list.
+    var updates = {};
+    updates['/games/' + newGameKey] = gameData;
+
+    firebase.database().ref().update(updates, onUpdateComplete);
+  }
+
+  var onUpdateComplete = function(error) {
+    if (error) {
+      console.log('Post failed to write');
+    } else {
+      console.log('Synchronization succeeded');
+    }
+  };
+  </script>
+</html>
