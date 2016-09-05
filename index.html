@@ -83,9 +83,21 @@
     firebase.initializeApp(config);
   </script>
   <script>
+  var currentUser;
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      currentUser = user;
+      console.log('User', user);
+      // User is signed in.
+
+    } else {
+      // No user is signed in.
+      window.location = '/login.html';
+    }
+  });
 
   //TODO: change this path
-  var boxPath = '/games/-KQvjeOLreJsmjCXTzDZ/boxes';
+  var boxPath = '/games/-KQvuHv-nbPIFSl9qY8K/boxes';
   var boxRefs = firebase.database().ref(boxPath);
 
   // handle initial fetch of box info
@@ -115,11 +127,23 @@
     if (box.user) {
       // show user name that owns box
       $(boxContainer).text(box.user.name);
+
+      // allow users to drop their own boxes
+      if (box.user.uid === currentUser.uid) {
+        var dropButton = '<button class="btn btn-xs btn-danger drop-button pull-right"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>';
+        $(boxContainer).append(dropButton);
+        var $dropButton = $(boxContainer).find('.drop-button')[0];
+        $dropButton.addEventListener("click", function(e) {
+          e.preventDefault();
+          dropBox(box);
+        })
+
+      }
     } else {
       // print a button to claim the box
-      var claimButton = '<button class="btn btn-xs btn-primary">claim</button>';
+      var claimButton = '<button class="btn btn-xs btn-primary claim-button">claim</button>';
       $(boxContainer).append(claimButton);
-      var $claimButton = $(boxContainer).find( "button" )[0]
+      var $claimButton = $(boxContainer).find('.claim-button')[0]
       $claimButton.addEventListener("click", function(e) {
         e.preventDefault();
         claimBox(box);
@@ -128,12 +152,22 @@
   }
 
   function claimBox(box) {
-    console.log(box);
-    var username = 'Mike';
-
     var boxUserData = {
-      name: username
+      uid: currentUser.uid,
+      name: currentUser.displayName,
+      photoURL: currentUser.photoURL,
+      email: currentUser.email
     };
+
+    var updates = {};
+    updates[boxPath + '/' + box.id + '/user'] = boxUserData;
+    return firebase.database().ref().update(updates, onUpdateComplete);
+  }
+
+  function dropBox(box) {
+    console.log('dropping', box);
+
+    var boxUserData = null
 
     var updates = {};
     updates[boxPath + '/' + box.id + '/user'] = boxUserData;
